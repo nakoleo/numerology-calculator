@@ -4,8 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>NUMEROLOGY CALCULATOR</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap');
     :root {
       --color-bg: #F9F7F1;
       --color-card: #FFFFFF;
@@ -74,11 +74,12 @@
     }
     table {
       width: 100%;
+      max-width: 100%;
       border-collapse: separate;
       border-spacing: 0;
-      min-width: 600px;
       border-radius: var(--radius);
-      overflow: hidden;
+      overflow: auto;
+      word-break: break-word;
     }
     th, td {
       padding: var(--spacing-sm) var(--spacing-md);
@@ -143,6 +144,7 @@
       border-radius: var(--radius / 2);
       background: var(--color-card);
       padding: var(--spacing-sm);
+      overflow-x: auto;
     }
     summary {
       cursor: pointer;
@@ -216,43 +218,4 @@
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       const mappingData = {
-        "1": { consonants:["ก","ด","ท","ถ","ภ","ฤ","ฤๅ"], vowels:["ุ","า","ำ","ๅ"], tone_marks:["่"], english_letters:["A","I","J","Q","Y"] },
-        "2": { consonants:["ข","ช","บ","ป","ง"], vowels:["ู","เ","แ"], tone_marks:["้"], english_letters:["B","K","R"] },
-        "3": { consonants:["ต","ฑ","ฒ","ฆ"], vowels:[], tone_marks:["๋"], english_letters:["C","G","L","S"] },
-        "4": { consonants:["ค","ธ","ญ","ร","ษ"], vowels:["โ","ะ","ั","ิ"], tone_marks:[], english_letters:["D","M","T"] },
-        "5": { consonants:["ฉ","ณ","ฌ","น","ม","ฬ","ฮ","ห","ฎ"], vowels:["ึ"], tone_marks:[], english_letters:["E","H","N","X"] },
-        "6": { consonants:["จ","ล","ว","อ"], vowels:[], tone_marks:[], english_letters:["U","V","W"] },
-        "7": { consonants:["ซ","ศ","ส"], vowels:["ี","ื"], tone_marks:["๊"], english_letters:["O","Z"] },
-        "8": { consonants:["ผ","ฝ","พ","ฟ","ย"], vowels:[], tone_marks:["็"], english_letters:["F","P"] },
-        "9": { consonants:["ฏ","ฐ"], vowels:["ไ"], tone_marks:["์"], english_letters:[] }
-      };
-      const mapBody = document.getElementById('mappingBody');
-      Object.entries(mappingData).forEach(([num, grp]) => {
-        const row = `<tr><td>${num}</td><td>${grp.consonants.join(', ')}</td><td>${grp.vowels.join(', ')||'-'}</td><td>${grp.tone_marks.join(', ')||'-'}</td><td>${grp.english_letters.join(', ')||'-'}</td></tr>`;
-        mapBody.insertAdjacentHTML('beforeend', row);
-      });
-      const getValue = ch => { for (const [num, grp] of Object.entries(mappingData)) if ([...grp.consonants, ...grp.vowels, ...grp.tone_marks, ...grp.english_letters].includes(ch)) return +num; return 0; };
-      const reduce = n => { while (n > 9) n = n.toString().split('').reduce((s,d)=>s+ +d, 0); return n; };
-      document.getElementById('calcBtn').addEventListener('click', () => {
-        const thai1 = [...document.getElementById('thaiFirst').value].map(ch => ({ch, val: getValue(ch)}));
-        const thai2 = [...document.getElementById('thaiLast').value].map(ch => ({ch, val: getValue(ch)}));
-        const eng1  = [...document.getElementById('engFirst').value.toUpperCase()].map(ch => ({ch, val: getValue(ch)}));
-        const eng2  = [...document.getElementById('engLast').value.toUpperCase()].map(ch => ({ch, val: getValue(ch)}));
-        const sumThai1 = thai1.reduce((s,o)=>s+o.val,0);
-        const sumThai2 = thai2.reduce((s,o)=>s+o.val,0);
-        const sumEng1  = eng1.reduce((s,o)=>s+o.val,0);
-        const sumEng2  = eng2.reduce((s,o)=>s+o.val,0);
-        const allThai = {details:[...thai1,...thai2], sum: sumThai1+sumThai2, single: reduce(sumThai1+sumThai2)};
-        const allEng  = {details:[...eng1,...eng2], sum: sumEng1+sumEng2, single: reduce(sumEng1+sumEng2)};
-        const renderTable = (idBody, rows) => { const tb = document.getElementById(idBody); tb.innerHTML = ''; rows.forEach(([lbl, data]) => { tb.insertAdjacentHTML('beforeend', `<tr><td>${lbl}</td><td>${data.sum}</td><td class="highlight">${data.single}</td></tr>`); }); };
-        renderTable('thaiResults', [['Name',{sum:sumThai1,single:reduce(sumThai1)}], ['Surname',{sum:sumThai2,single:reduce(sumThai2)}], ['Total',{sum:allThai.sum,single:allThai.single}]]);
-        renderTable('engResults', [['First',{sum:sumEng1,single:reduce(sumEng1)}], ['Last',{sum:sumEng2,single:reduce(sumEng2)}], ['Total',{sum:allEng.sum,single:allEng.single}]]);
-        const renderDetails = (idDiv, obj) => { const div = document.getElementById(idDiv); div.innerHTML = '<table><thead><tr><th>Char</th><th>Value</th></tr></thead><tbody>' + obj.details.map(o=>`<tr><td>${o.ch}</td><td>${o.val}</td></tr>`).join('') + `<tr><td>Sum</td><td>${obj.sum}</td></tr><tr><td>Single</td><td class='highlight'>${obj.single}</td></tr></tbody></table>`; };
-        renderDetails('thaiDetails', allThai); renderDetails('engDetails', allEng);
-        document.getElementById('output').style.display='block';
-      });
-      document.getElementById('resetBtn').addEventListener('click', ()=>{ document.getElementById('output').style.display='none'; ['thaiFirst','thaiLast','engFirst','engLast'].forEach(id=>document.getElementById(id).value=''); });
-    });
-  </script>
-</body>
-</html>
+        "1": { consonants:["ก","ด","ท","ถ","ภ","ฤ","ฤๅ"], vowels:[
